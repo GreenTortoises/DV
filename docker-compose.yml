@@ -46,6 +46,3 @@ services:
       - SPARK_SSL_ENABLED=no
     volumes:
       - ./data:/tmp/data
-  thrift:
-    image: docker.io/thrift:12
-    
