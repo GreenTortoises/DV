@@ -1,0 +1,51 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres:12
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    ports:
+      - '5438:5432'
+    volumes: 
+      - ./postgres-data:/var/lib/postgresql/data
+  denodo:
+    depends_on:
+      - db
+    image: denodo
+    volumes:
+      - ./licence/denodo-express-lic-8_0-202109.lic:/opt/denodo/conf/denodo.lic
+    ports:
+      - "9999:9999"
+      - "9997:9997"
+      - "9996:9996"
+      - "9995:9995"
+      - "9090:9090"
+    entrypoint: ["sh", "-c", "/opt/denodo/bin/vqlserver.sh startup"]
+  spark:
+    image: docker.io/bitnami/spark:3
+    environment:
+      - SPARK_MODE=master
+      - SPARK_RPC_AUTHENTICATION_ENABLED=no
+      - SPARK_RPC_ENCRYPTION_ENABLED=no
+      - SPARK_LOCAL_STORAGE_ENCRYPTION_ENABLED=no
+      - SPARK_SSL_ENABLED=no
+    ports:
+      - '8080:8080'
+  spark-worker-1:
+    image: docker.io/bitnami/spark:3
+    environment:
+      - SPARK_MODE=worker
+      - SPARK_MASTER_URL=spark://spark:7077
+      - SPARK_WORKER_MEMORY=1G
+      - SPARK_WORKER_CORES=1
+      - SPARK_RPC_AUTHENTICATION_ENABLED=no
+      - SPARK_RPC_ENCRYPTION_ENABLED=no
+      - SPARK_LOCAL_STORAGE_ENCRYPTION_ENABLED=no
+      - SPARK_SSL_ENABLED=no
+    volumes:
+      - ./data:/tmp/data
+  thrift:
+    image: docker.io/thrift:12
+    

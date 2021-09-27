@@ -1,0 +1,5 @@
+*.lic
+*.zip
+postgres-data/*
+!postgres-data/.keep
+*.csv
